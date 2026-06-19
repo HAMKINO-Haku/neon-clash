@@ -10,87 +10,36 @@
 <meta name="apple-mobile-web-app-title" content="NEON CLASH">
 <title>NEON CLASH</title>
 
-<!-- PWA manifest injected inline via JS blob -->
 <script>
 (function(){
-  // ── Inline SVG icons as data URLs ──────────────────────────────
-  // 512x512 neon clash icon
   const iconSVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
     <rect width="512" height="512" fill="#0a0a0f"/>
-    <defs>
-      <radialGradient id="g" cx="50%" cy="40%" r="60%">
-        <stop offset="0%" stop-color="#1a0a2e"/>
-        <stop offset="100%" stop-color="#0a0a0f"/>
-      </radialGradient>
-      <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    </defs>
+    <defs><radialGradient id="g" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#1a0a2e"/><stop offset="100%" stop-color="#0a0a0f"/></radialGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="border-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="50%" stop-color="#b366ff"/><stop offset="100%" stop-color="#ff3355"/></linearGradient></defs>
     <rect width="512" height="512" fill="url(#g)"/>
-    <!-- border -->
     <rect x="12" y="12" width="488" height="488" rx="40" ry="40" fill="none" stroke="url(#border-grad)" stroke-width="6"/>
-    <linearGradient id="border-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00d4ff"/>
-      <stop offset="50%" stop-color="#b366ff"/>
-      <stop offset="100%" stop-color="#ff3355"/>
-    </linearGradient>
-    <!-- ball 1 -->
     <circle cx="160" cy="256" r="72" fill="#00d4ff" fill-opacity=".18" filter="url(#glow)"/>
     <circle cx="160" cy="256" r="60" fill="#00d4ff" fill-opacity=".35"/>
     <circle cx="160" cy="256" r="52" fill="none" stroke="#00d4ff" stroke-width="4"/>
     <text x="160" y="280" text-anchor="middle" font-size="56" font-family="serif">⚡</text>
-    <!-- ball 2 -->
     <circle cx="352" cy="256" r="72" fill="#ff3355" fill-opacity=".18" filter="url(#glow)"/>
     <circle cx="352" cy="256" r="60" fill="#ff3355" fill-opacity=".35"/>
     <circle cx="352" cy="256" r="52" fill="none" stroke="#ff3355" stroke-width="4"/>
     <text x="352" y="280" text-anchor="middle" font-size="56" font-family="serif">🔥</text>
-    <!-- title -->
     <text x="256" y="420" text-anchor="middle" font-size="44" font-weight="900" font-family="Arial Black,sans-serif" letter-spacing="6" fill="url(#border-grad)" filter="url(#glow)">NEON CLASH</text>
-    <!-- VS -->
     <text x="256" y="270" text-anchor="middle" font-size="28" font-weight="900" font-family="Arial Black,sans-serif" fill="#b366ff" filter="url(#glow)" opacity=".8">VS</text>
   </svg>`;
-
   const iconURL = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(iconSVG)));
-
-  // Apple touch icon
-  const appleLink = document.createElement('link');
-  appleLink.rel = 'apple-touch-icon';
-  appleLink.href = iconURL;
-  document.head.appendChild(appleLink);
-
-  // Manifest blob
-  const manifest = {
-    name: "NEON CLASH 霓虹格鬥",
-    short_name: "NEON CLASH",
-    description: "霓虹格鬥競技遊戲 — 三種模式、三個角色",
-    start_url: "./",
-    display: "fullscreen",
-    orientation: "landscape",
-    background_color: "#0a0a0f",
-    theme_color: "#0a0a0f",
-    icons: [
-      { src: iconURL, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
-    ]
-  };
+  const appleLink = document.createElement('link');appleLink.rel = 'apple-touch-icon';appleLink.href = iconURL;document.head.appendChild(appleLink);
+  const manifest = {name:"NEON CLASH 霓虹格鬥",short_name:"NEON CLASH",description:"霓虹彈射格鬥",start_url:"./",display:"fullscreen",orientation:"landscape",background_color:"#0a0a0f",theme_color:"#0a0a0f",
+    icons:[{src:iconURL,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
   const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-  const mURL = URL.createObjectURL(mBlob);
-  const mLink = document.createElement('link');
-  mLink.rel = 'manifest';
-  mLink.href = mURL;
-  document.head.appendChild(mLink);
-
-  // Service Worker (inline via blob) for offline cache
+  const mLink = document.createElement('link');mLink.rel = 'manifest';mLink.href = URL.createObjectURL(mBlob);document.head.appendChild(mLink);
   if('serviceWorker' in navigator){
-    const swCode = `
-const CACHE='neon-clash-v1';
-self.addEventListener('install',e=>{self.skipWaiting();});
-self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});
-self.addEventListener('fetch',e=>{
-  e.respondWith(
-    caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('offline')))
-  );
-});`;
+    const swCode = `const CACHE='neon-clash-v2';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('offline'))));});`;
     const swBlob = new Blob([swCode],{type:'application/javascript'});
-    const swURL = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swURL).catch(()=>{});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
   }
 })();
 </script>
@@ -101,27 +50,19 @@ self.addEventListener('fetch',e=>{
 :root{--bg:#0a0a0f;--sf:#11111a;--bd:#1e1e30;--p1:#00d4ff;--p2:#ff3355;--gold:#ffd700;--pur:#b366ff;--tx:#e0e0f0;--dm:#6060a0;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'Noto Sans TC',sans-serif;touch-action:none;}
 
-/* ── INSTALL BANNER ── */
-#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;z-index:500;
-  background:linear-gradient(135deg,#0d0d20,#1a0a2e);border-top:1px solid var(--pur);
-  padding:10px 16px;flex-direction:row;align-items:center;gap:12px;}
+#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;z-index:500;background:linear-gradient(135deg,#0d0d20,#1a0a2e);border-top:1px solid var(--pur);padding:10px 16px;flex-direction:row;align-items:center;gap:12px;}
 #install-banner.show{display:flex;}
 .ib-icon{font-size:28px;flex-shrink:0;}
 .ib-txt{flex:1;}
 .ib-title{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--pur);letter-spacing:.15em;}
 .ib-sub{font-size:10px;color:var(--dm);margin-top:2px;}
-.ib-btn{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;
-  padding:8px 14px;border:1.5px solid var(--pur);background:rgba(179,102,255,.15);color:var(--pur);
-  white-space:nowrap;flex-shrink:0;}
+.ib-btn{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;padding:8px 14px;border:1.5px solid var(--pur);background:rgba(179,102,255,.15);color:var(--pur);white-space:nowrap;flex-shrink:0;}
 .ib-btn:active{background:var(--pur);color:var(--bg);}
 .ib-close{font-size:18px;color:var(--dm);padding:4px 8px;flex-shrink:0;}
 
-/* ── APPLE INSTALL GUIDE ── */
-#apple-guide{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);
-  flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:20px;}
+#apple-guide{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:20px;}
 #apple-guide.show{display:flex;}
-.ag-box{background:#12121f;border:1px solid var(--pur);border-radius:12px;
-  padding:20px;max-width:340px;width:90%;text-align:center;display:flex;flex-direction:column;gap:12px;}
+.ag-box{background:#12121f;border:1px solid var(--pur);border-radius:12px;padding:20px;max-width:340px;width:90%;text-align:center;display:flex;flex-direction:column;gap:12px;}
 .ag-title{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--gold);letter-spacing:.2em;}
 .ag-steps{font-size:12px;color:var(--tx);line-height:2;text-align:left;}
 .ag-steps span{color:var(--pur);}
@@ -129,7 +70,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
 .ag-close{font-family:'Orbitron',sans-serif;font-size:10px;color:var(--dm);padding:8px 20px;border:1px solid var(--bd);}
 
-/* Force landscape */
 #rotate-notice{display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 #rotate-notice.show{display:flex;}
 .rotate-icon{font-size:56px;animation:rot 1.5s ease-in-out infinite;}
@@ -139,17 +79,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;}
 .screen.active{display:flex;}
 
-/* ── TITLE ── */
 #s-title{background:radial-gradient(ellipse at 50% 30%,#1a0a2e,var(--bg) 70%);gap:20px;}
-.logo h1{font-family:'Orbitron',sans-serif;font-size:clamp(28px,6vw,56px);font-weight:900;letter-spacing:.12em;
-  background:linear-gradient(135deg,var(--p1),var(--pur),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;}
+.logo h1{font-family:'Orbitron',sans-serif;font-size:clamp(28px,6vw,56px);font-weight:900;letter-spacing:.12em;background:linear-gradient(135deg,var(--p1),var(--pur),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;}
 .logo .sub{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.5em;color:var(--dm);text-align:center;margin-top:4px;}
 .title-row{display:flex;flex-direction:row;gap:24px;align-items:flex-start;}
 .mode-btns{display:flex;flex-direction:column;gap:8px;width:min(280px,75vw);}
-.mode-btn{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;
-  padding:12px 16px;border:1.5px solid;background:var(--sf);cursor:pointer;
-  clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
-  display:flex;align-items:center;gap:10px;transition:all .15s;}
+.mode-btn{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;padding:12px 16px;border:1.5px solid;background:var(--sf);cursor:pointer;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);display:flex;align-items:center;gap:10px;transition:all .15s;}
 .mode-btn:active{filter:brightness(1.4);}
 .mode-btn .micon{font-size:18px;flex-shrink:0;}
 .mode-btn .mtxt{text-align:left;}
@@ -159,15 +94,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .mb-pve{border-color:var(--p1);color:var(--p1);}
 .mb-aiv{border-color:var(--p2);color:var(--p2);}
 .side-info{display:flex;flex-direction:column;gap:6px;align-items:flex-start;}
-.install-btn-main{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.1em;
-  padding:8px 14px;border:1px solid var(--gold);background:rgba(255,215,0,.08);color:var(--gold);cursor:pointer;}
+.install-btn-main{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.1em;padding:8px 14px;border:1px solid var(--gold);background:rgba(255,215,0,.08);color:var(--gold);cursor:pointer;}
 .install-btn-main:active{background:rgba(255,215,0,.25);}
 .ver-tag{font-size:8px;color:var(--dm);letter-spacing:.15em;}
 
-/* ── SELECT ── */
 #s-select{padding:0;overflow:hidden;}
-.sel-hdr{width:100%;padding:7px 14px;background:rgba(0,0,0,.8);border-bottom:1px solid var(--bd);
-  font-family:'Orbitron',sans-serif;font-size:10px;color:var(--gold);letter-spacing:.25em;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:16px;}
+.sel-hdr{width:100%;padding:7px 14px;background:rgba(0,0,0,.8);border-bottom:1px solid var(--bd);font-family:'Orbitron',sans-serif;font-size:10px;color:var(--gold);letter-spacing:.25em;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:16px;}
 .sel-hdr-mode{font-size:9px;color:var(--dm);}
 .sel-body{flex:1;width:100%;display:flex;overflow:hidden;}
 .player-col{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1.5px solid var(--bd);}
@@ -176,9 +108,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .pcol-lbl.p1l{color:var(--p1);}.pcol-lbl.p2l{color:var(--p2);}.pcol-lbl.ail{color:var(--dm);}
 .chars-scroll{flex:1;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;gap:6px;padding:6px 8px;-webkit-overflow-scrolling:touch;}
 .chars-scroll::-webkit-scrollbar{display:none;}
-.ccard{border:1.5px solid var(--bd);background:var(--sf);padding:8px 10px;cursor:pointer;
-  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
-  display:flex;gap:8px;align-items:flex-start;transition:all .12s;flex-shrink:0;}
+.ccard{border:1.5px solid var(--bd);background:var(--sf);padding:8px 10px;cursor:pointer;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);display:flex;gap:8px;align-items:flex-start;transition:all .12s;flex-shrink:0;}
 .ccard:active{transform:scale(.97);}
 .ccard.sel-p1{border-color:var(--p1);background:rgba(0,212,255,.08);box-shadow:0 0 12px rgba(0,212,255,.25);}
 .ccard.sel-p2{border-color:var(--p2);background:rgba(255,51,85,.08);box-shadow:0 0 12px rgba(255,51,85,.25);}
@@ -191,16 +121,31 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .cdot{width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0;}
 .cdot-a{background:rgba(255,255,255,.12);color:#fff;}.cdot-u{background:rgba(255,215,0,.18);color:var(--gold);}
 .sel-foot{width:100%;padding:8px 14px;background:var(--sf);border-top:1px solid var(--bd);flex-shrink:0;}
-.fight-btn{width:100%;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:.2em;
-  padding:12px;border:none;background:linear-gradient(90deg,var(--p1),var(--pur),var(--p2));
-  color:var(--bg);clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);transition:filter .2s;}
+.fight-btn{width:100%;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:.2em;padding:12px;border:none;background:linear-gradient(90deg,var(--p1),var(--pur),var(--p2));color:var(--bg);clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);transition:filter .2s;}
 .fight-btn:disabled{opacity:.3;filter:none;}
 .fight-btn:active:not(:disabled){filter:brightness(1.3);}
 
-/* ── GAME ── */
+/* ── LAUNCH AIM SCREEN ── */
+#s-launch{padding:0;flex-direction:column;background:radial-gradient(ellipse at 50% 30%,#140a24,var(--bg) 70%);}
+.launch-hdr{padding:8px 14px;font-family:'Orbitron',sans-serif;font-size:11px;color:var(--gold);letter-spacing:.2em;text-align:center;flex-shrink:0;}
+.launch-body{flex:1;width:100%;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:30px;padding:10px;}
+.aim-col{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.aim-label{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.2em;}
+.aim-label.p1l{color:var(--p1);}.aim-label.p2l{color:var(--p2);}
+.aim-pad{position:relative;width:140px;height:140px;border-radius:50%;border:2px solid var(--bd);background:rgba(255,255,255,.02);touch-action:none;}
+.aim-pad::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.03) 0%,transparent 70%);}
+.aim-center-dot{position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;background:var(--dm);transform:translate(-50%,-50%);}
+.aim-arrow{position:absolute;top:50%;left:50%;width:54px;height:4px;border-radius:2px;transform-origin:0 50%;pointer-events:none;}
+.aim-arrow.p1a{background:linear-gradient(90deg,var(--p1),transparent);}
+.aim-arrow.p2a{background:linear-gradient(90deg,var(--p2),transparent);}
+.aim-ball-icon{position:absolute;font-size:26px;transform:translate(-50%,-50%);pointer-events:none;filter:drop-shadow(0 0 6px currentColor);}
+.aim-deg{font-family:'Orbitron',sans-serif;font-size:10px;color:var(--dm);}
+.launch-foot{width:100%;padding:10px 14px;background:var(--sf);border-top:1px solid var(--bd);flex-shrink:0;}
+.launch-btn{width:100%;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:.2em;padding:12px;border:none;background:linear-gradient(90deg,var(--p1),var(--pur),var(--p2));color:var(--bg);clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);}
+.launch-btn:active{filter:brightness(1.3);}
+
 #s-game{padding:0;flex-direction:column;}
-.hud{width:100%;display:flex;align-items:center;gap:8px;padding:5px 10px;
-  background:rgba(0,0,0,.8);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.hud{width:100%;display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(0,0,0,.8);border-bottom:1px solid var(--bd);flex-shrink:0;}
 .hud-side{display:flex;flex-direction:column;gap:3px;flex:1;}
 .hud-side.r{align-items:flex-end;}
 .hname{font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:.08em;font-weight:700;}
@@ -219,37 +164,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .ssep{color:var(--dm);}.tmr{font-family:'Orbitron',sans-serif;font-size:8px;color:var(--dm);}
 .canvas-wrap{flex:1;width:100%;position:relative;overflow:hidden;}
 canvas{display:block;width:100%;height:100%;}
-.ctrl-ov{position:absolute;inset:0;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-end;padding:6px;}
-.ctrl-side{display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:all;}
-.dpad{position:relative;width:96px;height:96px;flex-shrink:0;}
-.dpad-btn{position:absolute;width:30px;height:30px;background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.18);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.dpad-btn.pressed{background:rgba(255,255,255,.28);}
-.dpad-u{top:0;left:33px}.dpad-d{bottom:0;left:33px}.dpad-l{top:33px;left:0}.dpad-r{top:33px;right:0}
-.dpad-c{top:33px;left:33px;background:rgba(255,255,255,.03);}
-.abtns{display:flex;gap:8px;}
-.abtn{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;border:2px solid;flex-direction:column;line-height:1.1;}
-.abtn:active,.abtn.pr{filter:brightness(1.6);transform:scale(.92);}
-.abtn-a{border-color:var(--tx);background:rgba(255,255,255,.07);color:var(--tx);}
-.abtn-u{border-color:var(--gold);background:rgba(255,215,0,.1);color:var(--gold);}
-.abtn-u.rdy{box-shadow:0 0 12px var(--gold);animation:blk .5s infinite;}
-.abtn span{font-size:7px;opacity:.7;}
-.ai-watch-lbl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  font-family:'Orbitron',sans-serif;font-size:9px;color:rgba(96,96,160,.5);letter-spacing:.3em;pointer-events:none;text-align:center;}
+
+.atk-mode-tag{position:absolute;font-family:'Orbitron',sans-serif;font-size:7px;letter-spacing:.1em;padding:3px 7px;border-radius:3px;pointer-events:none;background:rgba(0,0,0,.5);}
+
 #announce{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:50;}
-.atxt{font-family:'Orbitron',sans-serif;font-size:clamp(20px,5vw,44px);font-weight:900;
-  letter-spacing:.15em;opacity:0;transform:scale(1.3);transition:opacity .1s,transform .1s;text-align:center;text-shadow:0 0 28px currentColor;}
+.atxt{font-family:'Orbitron',sans-serif;font-size:clamp(20px,5vw,44px);font-weight:900;letter-spacing:.15em;opacity:0;transform:scale(1.3);transition:opacity .1s,transform .1s;text-align:center;text-shadow:0 0 28px currentColor;}
 #flash{position:absolute;inset:0;pointer-events:none;z-index:40;opacity:0;}
 
-/* ── RESULT ── */
 #s-result{gap:20px;}
 .rtitle{font-family:'Orbitron',sans-serif;font-size:clamp(24px,6vw,52px);font-weight:900;letter-spacing:.2em;text-shadow:0 0 24px currentColor;text-align:center;}
 .rsub{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--dm);letter-spacing:.3em;}
 .rbtns{display:flex;gap:10px;}
-.rbtn{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;
-  padding:12px 24px;border:2px solid;background:transparent;
-  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .15s;}
+.rbtn{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;padding:12px 24px;border:2px solid;background:transparent;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .15s;}
 .rbtn.rm{border-color:var(--p1);color:var(--p1);}.rbtn.rm:active{background:var(--p1);color:var(--bg);}
 .rbtn.mn{border-color:var(--dm);color:var(--dm);}.rbtn.mn:active{background:var(--dm);color:var(--bg);}
 
@@ -258,76 +184,77 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 </head>
 <body>
 
-<!-- ROTATE -->
-<div id="rotate-notice">
-  <div class="rotate-icon">📱</div>
-  <div class="rotate-txt">請將手機旋轉為橫向<br>PLEASE ROTATE TO LANDSCAPE</div>
-</div>
+<div id="rotate-notice"><div class="rotate-icon">📱</div><div class="rotate-txt">請將手機旋轉為橫向<br>PLEASE ROTATE TO LANDSCAPE</div></div>
 
-<!-- INSTALL BANNER (Android Chrome) -->
 <div id="install-banner">
   <div class="ib-icon">🎮</div>
-  <div class="ib-txt">
-    <div class="ib-title">安裝到桌面</div>
-    <div class="ib-sub">像 App 一樣離線遊玩</div>
-  </div>
+  <div class="ib-txt"><div class="ib-title">安裝到桌面</div><div class="ib-sub">像 App 一樣離線遊玩</div></div>
   <button class="ib-btn" onclick="doInstall()">安裝</button>
   <button class="ib-close" onclick="dismissBanner()">✕</button>
 </div>
 
-<!-- APPLE GUIDE -->
 <div id="apple-guide" onclick="this.classList.remove('show')">
   <div class="ag-box" onclick="event.stopPropagation()">
     <div class="ag-title">📱 加入主畫面 — iOS</div>
-    <div class="ag-steps">
-      1. 點下方 <span>分享按鈕 ⬆</span><br>
-      2. 選擇 <span>「加入主畫面」</span><br>
-      3. 點右上角 <span>「新增」</span><br>
-      4. 桌面就會出現 NEON CLASH 圖示！
-    </div>
+    <div class="ag-steps">1. 點下方 <span>分享按鈕 ⬆</span><br>2. 選擇 <span>「加入主畫面」</span><br>3. 點右上角 <span>「新增」</span><br>4. 桌面就會出現 NEON CLASH 圖示！</div>
     <div class="ag-arrow">👇</div>
     <button class="ag-close" onclick="document.getElementById('apple-guide').classList.remove('show')">知道了 OK</button>
   </div>
 </div>
 
-<!-- TITLE -->
 <div id="s-title" class="screen active">
-  <div class="logo"><h1>NEON CLASH</h1><div class="sub">霓虹格鬥 · ARENA BATTLE</div></div>
+  <div class="logo"><h1>NEON CLASH</h1><div class="sub">霓虹彈射格鬥 · ARENA BATTLE</div></div>
   <div class="title-row">
     <div class="mode-btns">
       <button class="mode-btn mb-pvp" onclick="gotoSelect('pvp')">
-        <span class="micon">👥</span>
-        <span class="mtxt"><span class="mtitle">雙人對戰 PvP</span><span class="mdesc">兩位玩家在同一台手機對決</span></span>
+        <span class="micon">👥</span><span class="mtxt"><span class="mtitle">雙人對戰 PvP</span><span class="mdesc">兩位玩家在同一台手機對決</span></span>
       </button>
       <button class="mode-btn mb-pve" onclick="gotoSelect('pve')">
-        <span class="micon">🤖</span>
-        <span class="mtxt"><span class="mtitle">單機挑戰 PvE</span><span class="mdesc">玩家對抗 AI 電腦</span></span>
+        <span class="micon">🤖</span><span class="mtxt"><span class="mtitle">單機挑戰 PvE</span><span class="mdesc">玩家對抗 AI 電腦</span></span>
       </button>
       <button class="mode-btn mb-aiv" onclick="gotoSelect('aiv')">
-        <span class="micon">👁</span>
-        <span class="mtxt"><span class="mtitle">AI 觀戰模式</span><span class="mdesc">觀看兩個 AI 自動對戰</span></span>
+        <span class="micon">👁</span><span class="mtxt"><span class="mtitle">AI 觀戰模式</span><span class="mdesc">觀看兩個 AI 自動對戰</span></span>
       </button>
     </div>
     <div class="side-info">
       <button class="install-btn-main" id="install-main-btn" onclick="triggerInstall()" style="display:none">⬇ 安裝到桌面</button>
-      <div class="ver-tag">v3.0 · PWA</div>
+      <div class="ver-tag">v4.0 · PHYSICS LAUNCH</div>
     </div>
   </div>
 </div>
 
-<!-- SELECT -->
 <div id="s-select" class="screen">
-  <div class="sel-hdr">
-    <span>⬡ 選擇角色 ⬡</span>
-    <span class="sel-hdr-mode" id="sel-mode-lbl"></span>
-  </div>
+  <div class="sel-hdr"><span>⬡ 選擇角色 ⬡</span><span class="sel-hdr-mode" id="sel-mode-lbl"></span></div>
   <div class="sel-body" id="sel-body"></div>
-  <div class="sel-foot">
-    <button class="fight-btn" id="fight-btn" onclick="startGame()" disabled>選擇角色後開始</button>
-  </div>
+  <div class="sel-foot"><button class="fight-btn" id="fight-btn" onclick="goLaunch()" disabled>選擇角色後開始</button></div>
 </div>
 
-<!-- GAME -->
+<!-- LAUNCH AIM SCREEN -->
+<div id="s-launch" class="screen">
+  <div class="launch-hdr">⬡ 設定彈射方向 ⬡ 滑動圓盤指定角度</div>
+  <div class="launch-body">
+    <div class="aim-col">
+      <div class="aim-label p1l" id="aim-p1-label">P1</div>
+      <div class="aim-pad" id="aimpad0">
+        <div class="aim-center-dot"></div>
+        <div class="aim-arrow p1a" id="aimarrow0"></div>
+        <div class="aim-ball-icon" id="aimball0" style="top:50%;left:50%;"></div>
+      </div>
+      <div class="aim-deg" id="aimdeg0">角度：0°</div>
+    </div>
+    <div class="aim-col">
+      <div class="aim-label p2l" id="aim-p2-label">P2</div>
+      <div class="aim-pad" id="aimpad1">
+        <div class="aim-center-dot"></div>
+        <div class="aim-arrow p2a" id="aimarrow1"></div>
+        <div class="aim-ball-icon" id="aimball1" style="top:50%;left:50%;"></div>
+      </div>
+      <div class="aim-deg" id="aimdeg1">角度：180°</div>
+    </div>
+  </div>
+  <div class="launch-foot"><button class="launch-btn" onclick="startGame()">⚔️ 發射！開始戰鬥</button></div>
+</div>
+
 <div id="s-game" class="screen">
   <div class="hud">
     <div class="hud-side">
@@ -349,113 +276,58 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
   </div>
   <div class="canvas-wrap">
     <canvas id="gc"></canvas>
-    <div class="ctrl-ov" id="ctrl-ov">
-      <div class="ctrl-side" id="p1-ctrl">
-        <div class="abtns">
-          <div class="abtn abtn-u" id="p1ub" ontouchstart="onUlt(0)">大招<span>ULT</span></div>
-          <div class="abtn abtn-a" id="p1ab" ontouchstart="onAtk(0)">普攻<span>ATK</span></div>
-        </div>
-        <div class="dpad" id="dp0">
-          <div class="dpad-btn dpad-u" data-p="0" data-d="0">▲</div>
-          <div class="dpad-btn dpad-d" data-p="0" data-d="1">▼</div>
-          <div class="dpad-btn dpad-l" data-p="0" data-d="2">◀</div>
-          <div class="dpad-btn dpad-r" data-p="0" data-d="3">▶</div>
-          <div class="dpad-c"></div>
-        </div>
-      </div>
-      <div class="ai-watch-lbl" id="ai-watch-lbl" style="display:none">👁 AI 觀戰模式<br>AUTO BATTLE</div>
-      <div class="ctrl-side" id="p2-ctrl">
-        <div class="dpad" id="dp1">
-          <div class="dpad-btn dpad-u" data-p="1" data-d="0">▲</div>
-          <div class="dpad-btn dpad-d" data-p="1" data-d="1">▼</div>
-          <div class="dpad-btn dpad-l" data-p="1" data-d="2">◀</div>
-          <div class="dpad-btn dpad-r" data-p="1" data-d="3">▶</div>
-          <div class="dpad-c"></div>
-        </div>
-        <div class="abtns">
-          <div class="abtn abtn-a" id="p2ab" ontouchstart="onAtk(1)">普攻<span>ATK</span></div>
-          <div class="abtn abtn-u" id="p2ub" ontouchstart="onUlt(1)">大招<span>ULT</span></div>
-        </div>
-      </div>
-    </div>
     <div id="announce"><div class="atxt" id="ann"></div></div>
     <div id="flash"></div>
   </div>
 </div>
 
-<!-- RESULT -->
 <div id="s-result" class="screen">
   <div class="rtitle" id="rt">WINNER!</div>
   <div class="rsub" id="rs">勝利</div>
-  <div class="rbtns">
-    <button class="rbtn rm" onclick="startGame()">REMATCH</button>
-    <button class="rbtn mn" onclick="show('s-title')">選單</button>
-  </div>
+  <div class="rbtns"><button class="rbtn rm" onclick="gotoSelect(gameMode)">REMATCH</button><button class="rbtn mn" onclick="show('s-title')">選單</button></div>
 </div>
 
 <script>
-// ═══════════════════════════
-// PWA INSTALL
-// ═══════════════════════════
+// ═══════════════════════════ PWA ═══════════════════════════
 let deferredPrompt=null;
 const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
 const isInStandalone=window.matchMedia('(display-mode:fullscreen)').matches||window.navigator.standalone;
-
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();deferredPrompt=e;
-  document.getElementById('install-banner').classList.add('show');
-  document.getElementById('install-main-btn').style.display='block';
-});
-
-function doInstall(){
-  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;dismissBanner();});}
-}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').classList.add('show');document.getElementById('install-main-btn').style.display='block';});
+function doInstall(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;dismissBanner();});}}
 function dismissBanner(){document.getElementById('install-banner').classList.remove('show');}
-function triggerInstall(){
-  if(deferredPrompt){doInstall();}
-  else if(isIOS&&!isInStandalone){document.getElementById('apple-guide').classList.add('show');}
-}
+function triggerInstall(){if(deferredPrompt){doInstall();}else if(isIOS&&!isInStandalone){document.getElementById('apple-guide').classList.add('show');}}
+window.addEventListener('load',()=>{if(isIOS&&!isInStandalone){document.getElementById('install-main-btn').style.display='block';}});
 
-// Show install btn on iOS if not installed
-window.addEventListener('load',()=>{
-  if(isIOS&&!isInStandalone){
-    document.getElementById('install-main-btn').style.display='block';
-  }
-});
-
-// ═══════════════════════════
-// LANDSCAPE
-// ═══════════════════════════
-function checkOrientation(){
-  const rn=document.getElementById('rotate-notice');
-  rn.classList.toggle('show',window.innerWidth<=window.innerHeight);
-}
+// ═══════════════════════════ LANDSCAPE ═══════════════════════════
+function checkOrientation(){document.getElementById('rotate-notice').classList.toggle('show',window.innerWidth<=window.innerHeight);}
 window.addEventListener('resize',checkOrientation);
 window.addEventListener('orientationchange',()=>setTimeout(checkOrientation,200));
 checkOrientation();
 
-// ═══════════════════════════
-// CHARACTERS
-// ═══════════════════════════
+// ═══════════════════════════ CHARACTERS ═══════════════════════════
+// atkMode: 'timer' = fires at range periodically, 'contact' = triggers on collision, 'proximity' = fires when enemy close
 const CHARS=[
   {id:'storm',icon:'⚡',name:'STORM',cn:'電磁風暴',color:'#00d4ff',tc:'rgba(0,212,255,',
-   desc:'高速衝刺型',radius:18,speed:5.5,mass:1.0,
-   sk:{a:{n:'閃電衝',d:'瞬間加速'},u:{n:'磁暴',d:'敵方減速'}},
+   desc:'定時遠程射擊型',radius:18,speed:1.0,mass:1.0,atkMode:'timer',atkInterval:150,
+   sk:{a:{n:'閃電彈',d:'每2.5秒發射追蹤彈'},u:{n:'磁暴',d:'敵方減速＋持續傷害'}},
    doAtk(b,g){
-     const a=Math.atan2(b.vy,b.vx)||0;b.vx+=Math.cos(a)*12;b.vy+=Math.sin(a)*12;
-     const m=Math.hypot(b.vx,b.vy);if(m>14){b.vx=b.vx/m*14;b.vy=b.vy/m*14;}
-     SP(g.ps,b.x,b.y,b.color,8,6);
+     // Fire a projectile toward enemy
+     const e=g.balls[b===g.balls[0]?1:0];
+     const dx=e.x-b.x,dy=e.y-b.y,d=Math.hypot(dx,dy)||1;
+     g.projs.push({x:b.x,y:b.y,vx:dx/d*9,vy:dy/d*9,r:6,color:b.color,owner:b,dmg:8,life:120});
+     SP(g.ps,b.x,b.y,b.color,6,4);
    },
-   doUlt(b,e,g){e.stun=180;g.fc=b.color;g.ft=10;SP(g.ps,e.x,e.y,'#00d4ff',30,10);AN('⚡ 磁暴！','#00d4ff');}
+   doUlt(b,e,g){e.stun=120;e.dot={t:180,dmg:0.4};g.fc=b.color;g.ft=10;SP(g.ps,e.x,e.y,'#00d4ff',30,10);AN('⚡ 磁暴！','#00d4ff');}
   },
   {id:'blaze',icon:'🔥',name:'BLAZE',cn:'烈焰爆破',color:'#ff6600',tc:'rgba(255,102,0,',
-   desc:'重型爆破型',radius:24,speed:4.0,mass:2.0,
-   sk:{a:{n:'爆破拳',d:'衝擊波'},u:{n:'核爆',d:'超大範圍'}},
+   desc:'碰撞引爆型',radius:24,speed:0.85,mass:2.0,atkMode:'contact',
+   sk:{a:{n:'爆破拳',d:'碰撞時額外引爆衝擊波'},u:{n:'核爆',d:'超大範圍爆炸傷害'}},
    doAtk(b,g){
      const e=g.balls[b===g.balls[0]?1:0];
-     const dx=e.x-b.x,dy=e.y-b.y,d=Math.hypot(dx,dy);
-     if(d<200){const f=12*(1-d/200);e.vx+=dx/d*f;e.vy+=dy/d*f;e.hp-=5;SP(g.ps,e.x,e.y,'#ff9900',12,6);}
-     SP(g.ps,b.x,b.y,'#ff6600',20,8);
+     const dx=e.x-b.x,dy=e.y-b.y,d=Math.hypot(dx,dy)||1;
+     const f=14;e.vx+=dx/d*f;e.vy+=dy/d*f;e.hp-=8;
+     SP(g.ps,b.x,b.y,'#ff6600',20,8);SP(g.ps,e.x,e.y,'#ff9900',16,7);
+     g.sk=10;
    },
    doUlt(b,e,g){
      e.hp-=30;e.vx+=(Math.random()-.5)*20;e.vy+=(Math.random()-.5)*20;
@@ -463,12 +335,13 @@ const CHARS=[
    }
   },
   {id:'void',icon:'🌀',name:'VOID',cn:'虛空使者',color:'#b366ff',tc:'rgba(179,102,255,',
-   desc:'詭異傳送型',radius:20,speed:4.5,mass:1.2,
-   sk:{a:{n:'虛空跳',d:'隨機傳送'},u:{n:'次元崩塌',d:'拉扯敵人'}},
+   desc:'近距感應觸發型',radius:20,speed:1.1,mass:1.2,atkMode:'proximity',atkRange:140,atkCooldownMax:100,
+   sk:{a:{n:'虛空爆',d:'敵方靠近時自動引爆'},u:{n:'次元崩塌',d:'拉扯敵人到自身位置'}},
    doAtk(b,g){
-     const px=b.x,py=b.y,cw=g.canvas.width,ch=g.canvas.height;
-     b.x=b.r+Math.random()*(cw-b.r*2);b.y=b.r+Math.random()*(ch-b.r*2);
-     SP(g.ps,px,py,'#b366ff',15,8);SP(g.ps,b.x,b.y,'#b366ff',15,8);
+     const e=g.balls[b===g.balls[0]?1:0];
+     const dx=e.x-b.x,dy=e.y-b.y,d=Math.hypot(dx,dy)||1;
+     e.vx-=dx/d*10;e.vy-=dy/d*10;e.hp-=10;
+     SP(g.ps,b.x,b.y,'#b366ff',18,7);SP(g.ps,e.x,e.y,'#cc99ff',14,6);
    },
    doUlt(b,e,g){
      const ex=e.x,ey=e.y;e.x=b.x+(Math.random()-.5)*60;e.y=b.y+(Math.random()-.5)*60;
@@ -481,16 +354,13 @@ const CHARS=[
 function SP(arr,x,y,col,n,spd){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=Math.random()*spd;arr.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col,life:50+Math.random()*20,ml:70,r:2+Math.random()*3});}}
 function AN(txt,col){const el=document.getElementById('ann');el.textContent=txt;el.style.color=col;el.style.opacity='1';el.style.transform='scale(1)';clearTimeout(window._at);window._at=setTimeout(()=>{el.style.opacity='0';el.style.transform='scale(.8)';},1500);}
 
-// ═══════════════════════════
-// NAV
-// ═══════════════════════════
+// ═══════════════════════════ NAV ═══════════════════════════
 let gameMode='pvp',selChars=[null,null];
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
 function gotoSelect(mode){
   gameMode=mode;selChars=[null,null];
-  const lbl=document.getElementById('sel-mode-lbl');
-  const body=document.getElementById('sel-body');
+  const lbl=document.getElementById('sel-mode-lbl'),body=document.getElementById('sel-body');
   lbl.textContent={pvp:'👥 雙人對戰',pve:'🤖 你 vs AI',aiv:'👁 AI 觀戰'}[mode];
   body.innerHTML='';
   if(mode==='pvp'){body.appendChild(mkCol('◆ PLAYER 1','p1l',0));body.appendChild(mkCol('◆ PLAYER 2','p2l',1));}
@@ -526,70 +396,104 @@ function pickChar(pi,ci){
 function checkReady(){
   const ok=selChars[0]!==null&&selChars[1]!==null;
   const btn=document.getElementById('fight-btn');btn.disabled=!ok;
-  btn.textContent=ok?({pvp:'⚔️ 開始決鬥！',pve:'⚔️ 挑戰 AI！',aiv:'▶ 開始觀戰！'}[gameMode]):'選擇兩個角色後開始';
+  btn.textContent=ok?'➡ 設定彈射方向':'選擇兩個角色後開始';
 }
 
-// ═══════════════════════════
-// TOUCH
-// ═══════════════════════════
-let tDirs=[[0,0,0,0],[0,0,0,0]],atkP=[false,false],ultP=[false,false];
+// ═══════════════════════════ LAUNCH AIM ═══════════════════════════
+let launchAngles=[0, Math.PI]; // radians, p1 default right, p2 default left
+let aimDragging=[false,false];
 
-function setupDpads(){
-  [0,1].forEach(pi=>{
-    const el=document.getElementById(`dp${pi}`);
-    el.addEventListener('touchstart',e=>{e.preventDefault();processDpad(e,pi);},{passive:false});
-    el.addEventListener('touchmove',e=>{e.preventDefault();processDpad(e,pi);},{passive:false});
-    el.addEventListener('touchend',e=>{e.preventDefault();tDirs[pi]=[0,0,0,0];el.querySelectorAll('.dpad-btn').forEach(b=>b.classList.remove('pressed'));},{passive:false});
-  });
-}
-function processDpad(e,pi){
-  tDirs[pi]=[0,0,0,0];document.querySelectorAll(`#dp${pi} .dpad-btn`).forEach(b=>b.classList.remove('pressed'));
-  [...e.changedTouches,...e.touches].forEach(t=>{
-    const el=document.elementFromPoint(t.clientX,t.clientY);
-    if(el&&el.dataset.p==pi&&el.dataset.d!==undefined){tDirs[pi][+el.dataset.d]=1;el.classList.add('pressed');}
-  });
-}
-function onAtk(pi){atkP[pi]=true;}
-function onUlt(pi){ultP[pi]=true;}
-
-// ═══════════════════════════
-// AI
-// ═══════════════════════════
-function aiInput(ball,enemy,game,pi){
-  const td=[0,0,0,0];
-  const dx=enemy.x-ball.x,dy=enemy.y-ball.y,dist=Math.hypot(dx,dy);
-  const cw=game.canvas.width,ch=game.canvas.height,m=60;
-  if(ball.x<m)td[3]=1;else if(ball.x>cw-m)td[2]=1;
-  if(ball.y<m)td[1]=1;else if(ball.y>ch-m)td[0]=1;
-  const aggro=gameMode==='aiv'?.85:.7;
-  if(Math.random()<aggro){
-    if(Math.abs(dx)>Math.abs(dy)){td[2]=dx<0?1:0;td[3]=dx>0?1:0;}
-    else{td[0]=dy<0?1:0;td[1]=dy>0?1:0;}
-  }
-  if(dist<180&&ball.atkCD<=0&&Math.random()<.06)atkP[pi]=true;
-  if(ball.ult>=100&&Math.random()<.03)ultP[pi]=true;
-  tDirs[pi]=td;
-}
-
-// ═══════════════════════════
-// GAME
-// ═══════════════════════════
-let G=null;
-function startGame(){
+function goLaunch(){
   if(selChars[0]===null||selChars[1]===null)return;
+  // Reset default angles facing each other
+  launchAngles=[0,Math.PI];
+  const c0=CHARS[selChars[0]],c1=CHARS[selChars[1]];
+  document.getElementById('aim-p1-label').textContent=(gameMode==='aiv'?'🤖 ':'')+c0.icon+' '+c0.name;
+  document.getElementById('aim-p2-label').textContent=(gameMode!=='pvp'?'🤖 ':'')+c1.icon+' '+c1.name;
+  const b0=document.getElementById('aimball0'),b1=document.getElementById('aimball1');
+  b0.textContent=c0.icon;b0.style.color=c0.color;
+  b1.textContent=c1.icon;b1.style.color=c1.color;
+  updateAimVisual(0);updateAimVisual(1);
+  setupAimPads();
+  show('s-launch');
+}
+
+function updateAimVisual(pi){
+  const ang=launchAngles[pi];
+  const arrow=document.getElementById('aimarrow'+pi);
+  arrow.style.transform=`rotate(${ang}rad)`;
+  const deg=Math.round(((ang*180/Math.PI)+360)%360);
+  document.getElementById('aimdeg'+pi).textContent='角度：'+deg+'°';
+  const ball=document.getElementById('aimball'+pi);
+  const r=50;
+  const bx=50+Math.cos(ang)*r/1.4,by=50+Math.sin(ang)*r/1.4;
+  ball.style.left=bx+'%';ball.style.top=by+'%';
+}
+
+function setupAimPads(){
+  [0,1].forEach(pi=>{
+    const pad=document.getElementById('aimpad'+pi);
+    pad.replaceWith(pad.cloneNode(true)); // clear old listeners
+  });
+  // Re-grab fresh elements & re-append inner content lost by clone
+  [0,1].forEach(pi=>{
+    const pad=document.getElementById('aimpad'+pi);
+    pad.innerHTML=`<div class="aim-center-dot"></div><div class="aim-arrow ${pi===0?'p1a':'p2a'}" id="aimarrow${pi}"></div><div class="aim-ball-icon" id="aimball${pi}"></div>`;
+    const c=CHARS[selChars[pi]];
+    document.getElementById('aimball'+pi).textContent=c.icon;
+    document.getElementById('aimball'+pi).style.color=c.color;
+    updateAimVisual(pi);
+
+    function handlePos(clientX,clientY){
+      const rect=pad.getBoundingClientRect();
+      const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+      const dx=clientX-cx,dy=clientY-cy;
+      launchAngles[pi]=Math.atan2(dy,dx);
+      updateAimVisual(pi);
+    }
+    pad.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];handlePos(t.clientX,t.clientY);},{passive:false});
+    pad.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];handlePos(t.clientX,t.clientY);},{passive:false});
+  });
+}
+
+// ═══════════════════════════ AI (for AI-controlled player target selection during reaction, not movement) ═══════════════════════════
+// AI no longer controls ball movement directly (physics-driven), but AI chooses initial launch angle smartly when in pve/aiv
+function aiPickLaunchAngle(pi){
+  // Aim roughly toward opponent's default position with slight randomness
+  const base = pi===0?0:Math.PI;
+  return base + (Math.random()-0.5)*0.6;
+}
+
+// ═══════════════════════════ GAME INIT ═══════════════════════════
+let G=null;
+
+function startGame(){
+  // If AI controls a side at launch screen, randomize its angle right before starting (so player still sees their own aim)
+  if(gameMode==='pve')launchAngles[1]=aiPickLaunchAngle(1);
+  if(gameMode==='aiv'){launchAngles[0]=aiPickLaunchAngle(0);launchAngles[1]=aiPickLaunchAngle(1);}
+
   show('s-game');
   const canvas=document.getElementById('gc'),wrap=document.querySelector('.canvas-wrap');
   function resize(){canvas.width=wrap.clientWidth;canvas.height=wrap.clientHeight;}
   resize();window.onresize=()=>{checkOrientation();resize();};
-  setupDpads();tDirs=[[0,0,0,0],[0,0,0,0]];atkP=[false,false];ultP=[false,false];
-  const p1c=document.getElementById('p1-ctrl'),p2c=document.getElementById('p2-ctrl'),aiL=document.getElementById('ai-watch-lbl');
-  if(gameMode==='pvp'){p1c.style.display='';p2c.style.display='';aiL.style.display='none';}
-  else if(gameMode==='pve'){p1c.style.display='';p2c.style.display='none';aiL.style.display='none';}
-  else{p1c.style.display='none';p2c.style.display='none';aiL.style.display='block';}
+
   const c0=CHARS[selChars[0]],c1=CHARS[selChars[1]];
-  function mkBall(ch,x,y){return{char:ch,x,y,vx:Math.random()*2+2,vy:Math.random()*2-1,r:ch.radius,color:ch.color,tc:ch.tc,hp:100,ult:0,atkCD:0,maxAtkCD:ch.id==='storm'?90:ch.id==='blaze'?75:100,stun:0,trail:[],hf:0};}
-  G={canvas,ctx:canvas.getContext('2d'),balls:[mkBall(c0,canvas.width*.25,canvas.height/2),mkBall(c1,canvas.width*.75,canvas.height/2)],ps:[],timer:60*60,scores:[0,0],running:true,fc:'#fff',ft:0,sk:0};
-  G.balls[1].vx*=-1;
+  const LAUNCH_SPEED=11;
+
+  function mkBall(ch,x,y,angle){
+    return{char:ch,x,y,
+      vx:Math.cos(angle)*LAUNCH_SPEED, vy:Math.sin(angle)*LAUNCH_SPEED,
+      r:ch.radius,color:ch.color,tc:ch.tc,
+      hp:100,ult:0,
+      atkTimer:0, // for timer mode
+      atkCD:0,    // for proximity mode cooldown
+      stun:0,dot:null,trail:[],hf:0};
+  }
+  G={canvas,ctx:canvas.getContext('2d'),
+    balls:[mkBall(c0,canvas.width*.25,canvas.height/2,launchAngles[0]),mkBall(c1,canvas.width*.75,canvas.height/2,launchAngles[1])],
+    projs:[],
+    ps:[],timer:60*60,scores:[0,0],running:true,fc:'#fff',ft:0,sk:0};
+
   document.getElementById('h-p1n').textContent=c0.icon+' '+c0.name+(gameMode==='aiv'?' AI':'');
   document.getElementById('h-p2n').textContent=c1.icon+' '+c1.name+(gameMode!=='pvp'?' AI':'');
   AN('FIGHT!','#ffd700');requestAnimationFrame(loop);
@@ -600,19 +504,41 @@ function loop(){if(!G||!G.running)return;update();draw();requestAnimationFrame(l
 function update(){
   const g=G,cw=g.canvas.width,ch=g.canvas.height,[b0,b1]=g.balls;
   g.timer--;if(g.timer<=0){endRound(null);return;}
-  if(gameMode==='pve')aiInput(b1,b0,g,1);
-  if(gameMode==='aiv'){aiInput(b0,b1,g,0);aiInput(b1,b0,g,1);}
-  handleBall(b0,g,0);handleBall(b1,g,1);
-  [b0,b1].forEach(b=>{
-    if(b.stun>0){b.stun--;return;}
-    b.vx*=.988;b.vy*=.988;
-    const lim=b.char.speed*1.6,m=Math.hypot(b.vx,b.vy);if(m>lim){b.vx=b.vx/m*lim;b.vy=b.vy/m*lim;}
-    b.x+=b.vx;b.y+=b.vy;
-    if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx);}if(b.x+b.r>cw){b.x=cw-b.r;b.vx=-Math.abs(b.vx);}
-    if(b.y-b.r<0){b.y=b.r;b.vy=Math.abs(b.vy);}if(b.y+b.r>ch){b.y=ch-b.r;b.vy=-Math.abs(b.vy);}
-    b.trail.unshift({x:b.x,y:b.y});if(b.trail.length>16)b.trail.pop();
-    if(b.atkCD>0)b.atkCD--;if(b.hf>0)b.hf--;
+
+  // ── Auto attack triggers per character mode ──
+  [b0,b1].forEach((b,i)=>{
+    if(b.stun>0)return;
+    const e=g.balls[i===0?1:0];
+    const dx=e.x-b.x,dy=e.y-b.y,dist=Math.hypot(dx,dy);
+    const mode=b.char.atkMode;
+    if(mode==='timer'){
+      b.atkTimer++;
+      if(b.atkTimer>=b.char.atkInterval){b.atkTimer=0;b.char.doAtk(b,g);b.ult=Math.min(100,b.ult+6);}
+    } else if(mode==='proximity'){
+      if(b.atkCD>0)b.atkCD--;
+      if(dist<b.char.atkRange&&b.atkCD<=0){b.atkCD=b.char.atkCooldownMax;b.char.doAtk(b,g);b.ult=Math.min(100,b.ult+6);}
+    }
+    // 'contact' mode handled in collision block below
   });
+
+  // ── Physics movement ──
+  [b0,b1].forEach(b=>{
+    if(b.stun>0){b.stun--;
+      if(b.dot&&b.dot.t>0){b.hp-=b.dot.dmg;b.dot.t--;}
+      return;
+    }
+    if(b.dot&&b.dot.t>0){b.hp-=b.dot.dmg;b.dot.t--;}
+    b.vx*=0.997;b.vy*=0.997; // very light friction, mostly elastic
+    b.x+=b.vx;b.y+=b.vy;
+    if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx);}
+    if(b.x+b.r>cw){b.x=cw-b.r;b.vx=-Math.abs(b.vx);}
+    if(b.y-b.r<0){b.y=b.r;b.vy=Math.abs(b.vy);}
+    if(b.y+b.r>ch){b.y=ch-b.r;b.vy=-Math.abs(b.vy);}
+    b.trail.unshift({x:b.x,y:b.y});if(b.trail.length>16)b.trail.pop();
+    if(b.hf>0)b.hf--;
+  });
+
+  // ── Ball vs Ball collision ──
   const dx=b1.x-b0.x,dy=b1.y-b0.y,dist=Math.hypot(dx,dy),minD=b0.r+b1.r;
   if(dist<minD&&dist>0){
     const nx=dx/dist,ny=dy/dist,ov=minD-dist;
@@ -622,23 +548,60 @@ function update(){
     const v1n_=(v1n*(b1.char.mass-b0.char.mass)+2*b0.char.mass*v0n)/tm;
     b0.vx+=(v0n_-v0n)*nx*1.05;b0.vy+=(v0n_-v0n)*ny*1.05;
     b1.vx+=(v1n_-v1n)*nx*1.05;b1.vy+=(v1n_-v1n)*ny*1.05;
-    const rel=Math.abs(v0n-v1n),dmg=Math.max(2,rel*2.5);
+    const rel=Math.abs(v0n-v1n),dmg=Math.max(2,rel*2.2);
     b0.hp-=dmg*(b1.char.mass/b0.char.mass);b1.hp-=dmg*(b0.char.mass/b1.char.mass);
-    b0.ult=Math.min(100,b0.ult+dmg*.8);b1.ult=Math.min(100,b1.ult+dmg*.8);
+    // ult charges from collision
+    b0.ult=Math.min(100,b0.ult+dmg*.7);b1.ult=Math.min(100,b1.ult+dmg*.7);
     b0.hf=8;b1.hf=8;SP(g.ps,(b0.x+b1.x)/2,(b0.y+b1.y)/2,'#fff',10,5);
+
+    // contact-mode attack trigger
+    [b0,b1].forEach(b=>{ if(b.char.atkMode==='contact'){ b.char.doAtk(b,g); } });
+
     if(b0.hp<=0){endRound(1);return;}if(b1.hp<=0){endRound(0);return;}
   }
-  g.ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life--;p.vx*=.95;p.vy*=.95;});
-  g.ps=g.ps.filter(p=>p.life>0);if(g.ft>0)g.ft--;if(g.sk>0)g.sk--;
-  updateHUD();
-}
 
-function handleBall(ball,g,pi){
-  if(ball.stun>0)return;
-  const td=tDirs[pi],spd=ball.char.speed*.5;
-  if(td[0])ball.vy-=spd;if(td[1])ball.vy+=spd;if(td[2])ball.vx-=spd;if(td[3])ball.vx+=spd;
-  if(atkP[pi]&&ball.atkCD<=0){ball.atkCD=ball.maxAtkCD;ball.char.doAtk(ball,g);atkP[pi]=false;ball.ult=Math.min(100,ball.ult+8);}else if(atkP[pi])atkP[pi]=false;
-  if(ultP[pi]&&ball.ult>=100){ball.ult=0;const en=g.balls[ball===g.balls[0]?1:0];ball.char.doUlt(ball,en,g);ultP[pi]=false;if(en.hp<=0)endRound(pi);}else if(ultP[pi])ultP[pi]=false;
+  // ── Ultimate auto-trigger when bar full ──
+  [b0,b1].forEach((b,i)=>{
+    if(b.ult>=100){
+      const e=g.balls[i===0?1:0];
+      b.ult=0;
+      b.char.doUlt(b,e,g);
+      if(e.hp<=0){endRound(i);}
+    }
+  });
+
+  // ── Time-based ult charge (passive trickle) ──
+  [b0,b1].forEach(b=>{ if(b.ult<100) b.ult=Math.min(100,b.ult+0.06); });
+
+  // ── Projectiles ──
+  g.projs.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.life--;
+    // bounce off walls
+    if(p.x-p.r<0||p.x+p.r>cw)p.vx*=-1;
+    if(p.y-p.r<0||p.y+p.r>ch)p.vy*=-1;
+    p.x=Math.max(p.r,Math.min(cw-p.r,p.x));
+    p.y=Math.max(p.r,Math.min(ch-p.r,p.y));
+  });
+  // projectile collision vs balls (not owner)
+  g.projs.forEach(p=>{
+    [b0,b1].forEach(b=>{
+      if(b===p.owner||p.dead)return;
+      const ddx=b.x-p.x,ddy=b.y-p.y,dd=Math.hypot(ddx,ddy);
+      if(dd<b.r+p.r){
+        b.hp-=p.dmg;b.hf=8;
+        b.ult=Math.min(100,b.ult+p.dmg*.5);
+        SP(g.ps,p.x,p.y,p.color,10,5);
+        p.dead=true;
+        if(b.hp<=0){endRound(b===b0?1:0);}
+      }
+    });
+  });
+  g.projs=g.projs.filter(p=>p.life>0&&!p.dead);
+
+  g.ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life--;p.vx*=.95;p.vy*=.95;});
+  g.ps=g.ps.filter(p=>p.life>0);
+  if(g.ft>0)g.ft--;if(g.sk>0)g.sk--;
+  updateHUD();
 }
 
 function updateHUD(){
@@ -650,10 +613,8 @@ function updateHUD(){
   document.getElementById('hs1').textContent=G.scores[0];document.getElementById('hs2').textContent=G.scores[1];
   document.getElementById('htmr').textContent=Math.ceil(G.timer/60);
   const u0=document.getElementById('h-p1ulbl'),u1=document.getElementById('h-p2ulbl');
-  u0.classList.toggle('ura',b0.ult>=100);u0.textContent=b0.ult>=100?'★ READY':'ULTIMATE';
-  u1.classList.toggle('ura',b1.ult>=100);u1.textContent=b1.ult>=100?'★ READY':'ULTIMATE';
-  document.getElementById('p1ub').classList.toggle('rdy',b0.ult>=100);
-  document.getElementById('p2ub').classList.toggle('rdy',b1.ult>=100);
+  u0.classList.toggle('ura',b0.ult>=95);u0.textContent=b0.ult>=95?'★ CHARGING':'ULTIMATE';
+  u1.classList.toggle('ura',b1.ult>=95);u1.textContent=b1.ult>=95?'★ CHARGING':'ULTIMATE';
 }
 
 function draw(){
@@ -665,21 +626,36 @@ function draw(){
   for(let y=0;y<ch;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cw,y);ctx.stroke();}
   const bg=ctx.createLinearGradient(0,0,cw,0);bg.addColorStop(0,'#00d4ff');bg.addColorStop(.5,'#b366ff');bg.addColorStop(1,'#ff3355');
   ctx.strokeStyle=bg;ctx.lineWidth=3;ctx.shadowColor='#b366ff';ctx.shadowBlur=12;ctx.strokeRect(2,2,cw-4,ch-4);ctx.shadowBlur=0;
+
+  // particles
   g.ps.forEach(p=>{const a=p.life/p.ml;ctx.globalAlpha=a;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r*a,0,Math.PI*2);ctx.fill();});
   ctx.globalAlpha=1;
+
+  // trails
   g.balls.forEach(b=>{b.trail.forEach((t,i)=>{const a=(1-i/b.trail.length)*.28;ctx.beginPath();ctx.arc(t.x,t.y,b.r*(1-i/b.trail.length)*.6,0,Math.PI*2);ctx.fillStyle=b.tc+a+')';ctx.fill();});});
+
+  // projectiles
+  g.projs.forEach(p=>{
+    ctx.save();ctx.shadowColor=p.color;ctx.shadowBlur=10;
+    ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  });
+
+  // balls
   g.balls.forEach(b=>{
     ctx.save();ctx.shadowColor=b.color;ctx.shadowBlur=b.hf>0?36:16;
     const gr=ctx.createRadialGradient(b.x-b.r*.3,b.y-b.r*.3,b.r*.1,b.x,b.y,b.r);
     gr.addColorStop(0,b.hf>0?'#fff':'rgba(255,255,255,.5)');gr.addColorStop(.4,b.hf>0?'rgba(255,255,255,.7)':b.color+'cc');gr.addColorStop(1,b.hf>0?b.color:b.color+'33');
     ctx.fillStyle=gr;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
     if(b.stun>0){ctx.strokeStyle='#6666ff';ctx.lineWidth=3;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(b.x,b.y,b.r+6+Math.sin(Date.now()*.01)*3,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
+    if(b.dot&&b.dot.t>0){ctx.strokeStyle='#0088aa';ctx.lineWidth=2;ctx.beginPath();ctx.arc(b.x,b.y,b.r+4,0,Math.PI*2);ctx.stroke();}
     ctx.strokeStyle=b.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.stroke();ctx.restore();
     ctx.font=`${b.r}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.char.icon,b.x,b.y);
-    ctx.save();ctx.strokeStyle=b.color+'88';ctx.lineWidth=3;ctx.beginPath();ctx.arc(b.x,b.y,b.r+8,-Math.PI/2,-Math.PI/2+(b.hp/100)*Math.PI*2);ctx.stroke();
-    if(b.ult>0){ctx.strokeStyle=b.ult>=100?'#ffd700':'#ffd70055';ctx.lineWidth=2;ctx.shadowColor='#ffd700';ctx.shadowBlur=b.ult>=100?10:0;ctx.beginPath();ctx.arc(b.x,b.y,b.r+13,-Math.PI/2,-Math.PI/2+(b.ult/100)*Math.PI*2);ctx.stroke();}
+    ctx.save();ctx.strokeStyle=b.color+'88';ctx.lineWidth=3;ctx.beginPath();ctx.arc(b.x,b.y,b.r+8,-Math.PI/2,-Math.PI/2+(Math.max(0,b.hp)/100)*Math.PI*2);ctx.stroke();
+    if(b.ult>0){ctx.strokeStyle=b.ult>=95?'#ffd700':'#ffd70055';ctx.lineWidth=2;ctx.shadowColor='#ffd700';ctx.shadowBlur=b.ult>=95?10:0;ctx.beginPath();ctx.arc(b.x,b.y,b.r+13,-Math.PI/2,-Math.PI/2+(b.ult/100)*Math.PI*2);ctx.stroke();}
     ctx.restore();
   });
+
   ctx.restore();
   const fe=document.getElementById('flash');
   if(g.ft>0){fe.style.background=g.fc;fe.style.opacity=g.ft/15*.42;}else fe.style.opacity=0;
